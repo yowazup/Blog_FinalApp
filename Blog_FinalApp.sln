@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.7.34003.232
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blog.PLL", "Blog_FinalApp\Blog.PLL.csproj", "{CFE256B2-2668-4CCD-AC6D-B120752C5D56}"
+	ProjectSection(ProjectDependencies) = postProject
+		{65489E9F-0884-40F8-B90F-A62F6416F99E} = {65489E9F-0884-40F8-B90F-A62F6416F99E}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blog.DAL", "Blog.DAL\Blog.DAL.csproj", "{48D59FAF-863E-4A01-AFBD-9C9D40A898F7}"
 EndProject

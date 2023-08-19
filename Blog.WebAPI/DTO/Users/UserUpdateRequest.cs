@@ -1,6 +1,4 @@
 ﻿
-using Blog.DAL.Models;
-
 namespace Blog.WebAPI.DTO.Users
 {
     public class UserUpdateRequest

@@ -1,5 +1,9 @@
-﻿using Blog.BLL.Services.IServices;
+﻿using AutoMapper;
+using Blog.BLL.Services;
+using Blog.BLL.Services.IServices;
 using Blog.WebAPI.DTO.Comments;
+using Blog.WebAPI.DTO.Posts;
+using Blog.WebAPI.DTO.Responses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Blog.WebAPI.Controllers
@@ -11,10 +15,12 @@ namespace Blog.WebAPI.Controllers
     public class CommentController : ControllerBase
     {
         private readonly ICommentService _commentService;
+        private readonly IMapper _mapper;
 
-        public CommentController(ICommentService commentService)
+        public CommentController(ICommentService commentService, IMapper mapper)
         {
             _commentService = commentService;
+            _mapper = mapper;
         }
 
         [HttpPost]
@@ -22,7 +28,7 @@ namespace Blog.WebAPI.Controllers
         public async Task<IActionResult> AddComment(CommentAddRequest addRequest)
         {
             var newComment = await _commentService.AddComment(addRequest.CommentContent, addRequest.PostId, addRequest.UserId);
-            return StatusCode(201, $"Комментарий пользователя {newComment.UserId} добавлен. Идентификатор: {newComment.Id}");
+            return StatusCode(201, _mapper.Map<CommentResponse>(newComment));
         }
 
         [HttpDelete]
@@ -30,7 +36,7 @@ namespace Blog.WebAPI.Controllers
         public async Task<IActionResult> DeleteComment(int commentId)
         {
             var deletedComment = await _commentService.DeleteComment(_commentService.GetCommentById(commentId));
-            return StatusCode(201, $"Комментарий пользователя {deletedComment.UserId} добавлен. Идентификатор: {deletedComment.Id}");
+            return StatusCode(201, _mapper.Map<CommentResponse>(deletedComment));
         }
 
         [HttpPatch]
@@ -38,38 +44,46 @@ namespace Blog.WebAPI.Controllers
         public async Task<IActionResult> UpdateComment(int commentId, CommentUpdateRequest updateRequest)
         {
             var updatedComment = await _commentService.UpdateComment(_commentService.GetCommentById(commentId), updateRequest.CommentContent);
-            return StatusCode(201, $"Комментарий пользователя {updatedComment.UserId} обновлен. Идентификатор: {updatedComment.Id}");
+            return StatusCode(201, _mapper.Map<CommentResponse>(updatedComment));
         }
 
         [HttpGet]
         [Route("comments/search")]
         public IActionResult GetCommentsByContent([FromQuery] string searchRequest)
         {
-            var foundComments = _commentService.GetCommentsByContent(searchRequest);
-            return StatusCode(201, $"Найдено комментариев: {foundComments.Count}");
+            var foundComments = new List<CommentResponse>();
+            foreach (var c in _commentService.GetCommentsByContent(searchRequest))
+                foundComments.Add(_mapper.Map<CommentResponse>(c));
+            return StatusCode(201, foundComments);
         }
 
         [HttpGet]
         [Route("comments")]
         public IActionResult GetAllComments()
         {
-            var allComments = _commentService.GetAllComments();
-            return StatusCode(201, $"Найдено комментариев: {allComments.Count}");
+            var allComments = new List<CommentResponse>();
+            foreach (var c in _commentService.GetAllComments())
+                allComments.Add(_mapper.Map<CommentResponse>(c));
+            return StatusCode(201, allComments);
         }
 
         [HttpGet]
         [Route("comments/:commentId")]
         public IActionResult GetCommentById(int commentId)
         {
-            var foundComment = _commentService.GetCommentById(commentId);
-
-            if (foundComment.Id == commentId)
+            try
             {
-                return StatusCode(201, $"Комментарий с идентификатором {commentId} найден.");
+                var foundComment = _commentService.GetCommentById(commentId);
+                return StatusCode(201, _mapper.Map<CommentResponse>(foundComment));
             }
-            else
+            catch (InvalidOperationException)
             {
-                return StatusCode(404, $"Комментарий с идентификатором {commentId} не найден.");
+                var response = new ServerResponse()
+                {
+                    StatusCode = 404,
+                    Comment = "Комментария с таким идентификатором не существует.",
+                };
+                return StatusCode(response.StatusCode, response);
             }
         }
     }

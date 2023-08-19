@@ -25,7 +25,7 @@ namespace Blog.DAL.Repositories
 
         public List<Post> GetAllPosts()
         {
-            return _context.Posts.Include(x => x.Tags).ToList();
+            return _context.Posts.Include(x => x.Tags).Include(y => y.Comments).ToList();
         }
 
         public Post GetPostById(int postId)

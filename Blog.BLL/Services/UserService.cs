@@ -12,7 +12,7 @@ namespace Blog.BLL.Services
         public UserService(IUserRepository userRepo, IRoleService roleService)
         {
             _userRepo = userRepo;
-            _roleService = roleService; 
+            _roleService = roleService;
         }
 
         public async Task<User> AddUser(string firstName, string lastName, string password, string email, string photo)
@@ -24,14 +24,21 @@ namespace Blog.BLL.Services
                 Password = password,
                 Email = email,
                 Photo = photo,
-                Role = _roleService.GetRoleById(1)
+                Role = _roleService.GetRoleByName("Пользователь")
             };
             await _userRepo.AddUser(user);
 
             return user;
         }
 
-        public async Task<User> UpdateUser(int userId, string firstName, string lastName, string password, string email, string photo, int roleId)
+        public async Task<User> UpdateUser(
+            int userId,
+            string firstName,
+            string lastName,
+            string password,
+            string email,
+            string photo,
+            int roleId)
         {
             var role = _roleService.GetRoleById(roleId);
             await _userRepo.UpdateUser(userId, firstName, lastName, password, email, photo, role);

@@ -1,21 +1,26 @@
-﻿using Blog.BLL.Services;
+﻿using AutoMapper;
 using Blog.BLL.Services.IServices;
+using Blog.WebAPI.DTO.Comments;
 using Blog.WebAPI.DTO.Posts;
+using Blog.WebAPI.DTO.Responses;
+using Blog.WebAPI.DTO.Tags;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Blog.WebAPI.Controllers
 {
     // ПОЛУЧЕНИЕ ВСЕХ СТАТЕЙ ОПРЕДЕЛЕННОГО АВТОРА ПО ЕГО ИДЕНТИФИКАТОРУ РЕАЛИЗОВАНО В КОНТРОЛЛЕРЕ USER
-    
+
     [ApiController]
     [Route("api/v1")]
     public class PostController : ControllerBase
     {
         private readonly IPostService _postService;
+        private readonly IMapper _mapper;
 
-        public PostController(IPostService postService)
+        public PostController(IPostService postService, IMapper mapper)
         {
             _postService = postService;
+            _mapper = mapper;
         }
 
         [HttpPost]
@@ -23,7 +28,7 @@ namespace Blog.WebAPI.Controllers
         public async Task<IActionResult> AddPost(PostAddRequest addRequest)
         {
             var newPost = await _postService.AddPost(addRequest.PostContent, addRequest.Tags, addRequest.UserId);
-            return StatusCode(201, $"Пост пользователя {newPost.UserId} добавлен. Идентификатор: {newPost.Id}");
+            return StatusCode(201, _mapper.Map<PostResponse>(newPost));
         }
 
         [HttpDelete]
@@ -31,7 +36,7 @@ namespace Blog.WebAPI.Controllers
         public async Task<IActionResult> DeletePost(int postId)
         {
             var deletedPost = await _postService.DeletePost(_postService.GetPostById(postId));
-            return StatusCode(201, $"Пост пользователя {deletedPost.UserId} удален. Идентификатор: {deletedPost.Id}");
+            return StatusCode(201, _mapper.Map<PostResponse>(deletedPost));
         }
 
         [HttpPatch]
@@ -39,23 +44,27 @@ namespace Blog.WebAPI.Controllers
         public async Task<IActionResult> UpdatePost(int postId, PostUpdateRequest updateRequest)
         {
             var updatedPost = await _postService.UpdatePost(_postService.GetPostById(postId), updateRequest.PostContent, updateRequest.Tags);
-            return StatusCode(201, $"Пост пользователя {updatedPost.UserId} обновлен. Идентификатор: {updatedPost.Id}");
+            return StatusCode(201, _mapper.Map<PostResponse>(updatedPost));
         }
 
         [HttpGet]
         [Route("posts/search")]
         public IActionResult GetPostsByContent([FromQuery] string searchRequest)
         {
-            var foundPosts = _postService.GetPostsByContent(searchRequest);
-            return StatusCode(201, $"Найдено постов: {foundPosts.Count}");
+            var foundPosts = new List<PostResponse>();
+            foreach (var p in _postService.GetPostsByContent(searchRequest))
+                foundPosts.Add(_mapper.Map<PostResponse>(p));
+            return StatusCode(201, foundPosts);
         }
 
         [HttpGet]
         [Route("posts")]
         public IActionResult GetAllPosts()
         {
-            var allPosts = _postService.GetAllPosts();
-            return StatusCode(201, $"Найдено постов: {allPosts.Count}");
+            var allPosts = new List<PostResponse>();
+            foreach (var p in _postService.GetAllPosts())
+                allPosts.Add(_mapper.Map<PostResponse>(p));
+            return StatusCode(201, allPosts);
         }
 
         [HttpGet]
@@ -63,7 +72,7 @@ namespace Blog.WebAPI.Controllers
         public IActionResult GetTagsForPost(int postId)
         {
             var tags = _postService.GetPostById(postId).Tags;
-            return StatusCode(201, $"Найдено тегов: {tags.Count}");
+            return StatusCode(201, _mapper.Map<TagResponse>(tags));
         }
 
         [HttpGet]
@@ -71,22 +80,26 @@ namespace Blog.WebAPI.Controllers
         public IActionResult GetCommentsForPost(int postId)
         {
             var comments = _postService.GetPostById(postId).Comments;
-            return StatusCode(201, $"Найдено комментариев: {comments.Count}");
+            return StatusCode(201, _mapper.Map<CommentResponse>(comments));
         }
 
         [HttpGet]
         [Route("posts/:postId")]
         public IActionResult GetPostById(int postId)
         {
-            var foundPost = _postService.GetPostById(postId);
-
-            if (foundPost.Id == postId)
+            try
             {
-                return StatusCode(201, $"Пост с идентификатором {postId} найден.");
+                var foundPost = _postService.GetPostById(postId);
+                return StatusCode(201, _mapper.Map<PostResponse>(foundPost));
             }
-            else
+            catch (InvalidOperationException)
             {
-                return StatusCode(404, $"Пост с идентификатором {postId} не найден.");
+                var response = new ServerResponse()
+                {
+                    StatusCode = 404,
+                    Comment = "Поста с таким идентификатором не существует.",
+                };
+                return StatusCode(response.StatusCode, response);
             }
         }
     }

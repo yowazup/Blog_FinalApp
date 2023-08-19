@@ -23,7 +23,7 @@ namespace Blog.DAL.Repositories
 
         public List<User> GetAllUsers()
         {
-            return _context.Users.Include(x => x.Posts).Include(y => y.Comments).ToList();
+            return _context.Users.Include(x => x.Posts).Include(y => y.Comments).Include(z => z.Role).ToList();
         }
 
         public User GetUserById(int userId)

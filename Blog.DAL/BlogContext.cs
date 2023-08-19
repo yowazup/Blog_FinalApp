@@ -25,14 +25,14 @@ namespace Blog.DAL
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Role>().HasData(
+            modelBuilder.Entity<Role>()
+             .HasData(
                 new Role { Id = 1, Name = "Пользователь" },
                 new Role { Id = 2, Name = "Модератор" },
                 new Role { Id = 3, Name = "Администратор" }
                 );
 
-            modelBuilder
-            .Entity<Role>()
+            modelBuilder.Entity<Role>()
             .Property(role => role.Permissions)
             .HasColumnType("text")
             .HasConversion(
