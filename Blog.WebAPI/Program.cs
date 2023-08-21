@@ -5,9 +5,7 @@ using Blog.DAL;
 using Blog.DAL.Repositories;
 using Blog.DAL.Repositories.IRepositories;
 using Blog.WebAPI;
-using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 

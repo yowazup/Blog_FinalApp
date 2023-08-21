@@ -1,6 +1,6 @@
 ﻿namespace Blog.WebAPI.DTO.Responses
 {
-    public class ServerResponse
+    public class StatusCodeResponse
     {
         public int StatusCode { get; set; }
         public string Comment { get; set; } = string.Empty;

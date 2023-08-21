@@ -3,6 +3,7 @@ using Blog.BLL.Services.IServices;
 using Blog.WebAPI.DTO.Posts;
 using Blog.WebAPI.DTO.Responses;
 using Blog.WebAPI.DTO.Tags;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Blog.WebAPI.Controllers
@@ -20,6 +21,7 @@ namespace Blog.WebAPI.Controllers
             _mapper = mapper;
         }
 
+        [Authorize]
         [HttpPost]
         [Route("tags")]
         public async Task<IActionResult> AddTag(TagAddRequest addRequest)
@@ -28,6 +30,7 @@ namespace Blog.WebAPI.Controllers
             return StatusCode(201, _mapper.Map<TagResponse>(newTag));
         }
 
+        [Authorize(Roles = "Администратор, Модератор")]
         [HttpDelete]
         [Route("tags/:tagId")]
         public async Task<IActionResult> DeleteTag(int tagId)
@@ -36,14 +39,17 @@ namespace Blog.WebAPI.Controllers
             return StatusCode(201, _mapper.Map<TagResponse>(deletedTag));
         }
 
+        [Authorize(Roles = "Администратор, Модератор")]
         [HttpPatch]
         [Route("tags/:tagId")]
-        public async Task<IActionResult> UpdateComment(int tagId, TagUpdateRequest updateRequest)
+        public async Task<IActionResult> UpdateTag(int tagId, TagUpdateRequest updateRequest)
         {
             var updatedTag = await _tagService.UpdateTag(_tagService.GetTagById(tagId), updateRequest.TagContent);
             return StatusCode(201, _mapper.Map<TagResponse>(updatedTag));
+
         }
 
+        [Authorize]
         [HttpGet]
         [Route("tags/search")]
         public IActionResult GetTagsByContent(string searchRequest)
@@ -54,6 +60,7 @@ namespace Blog.WebAPI.Controllers
             return StatusCode(201, foundTags);
         }
 
+        [Authorize]
         [HttpGet]
         [Route("tags")]
         public IActionResult GetAllTags()
@@ -64,6 +71,7 @@ namespace Blog.WebAPI.Controllers
             return StatusCode(201, allTags);
         }
 
+        [Authorize]
         [HttpGet]
         [Route("tags/:tagId/posts")]
         public IActionResult GetPostsForTag(int tagId)
@@ -72,6 +80,7 @@ namespace Blog.WebAPI.Controllers
             return StatusCode(201, _mapper.Map<PostResponse>(posts));
         }
 
+        [Authorize]
         [HttpGet]
         [Route("tags/:tagId")]
         public IActionResult GetTagById(int tagId)
@@ -83,7 +92,7 @@ namespace Blog.WebAPI.Controllers
             }
             catch (InvalidOperationException)
             {
-                var response = new ServerResponse()
+                var response = new StatusCodeResponse()
                 {
                     StatusCode = 404,
                     Comment = "Тега с таким идентификатором не существует.",

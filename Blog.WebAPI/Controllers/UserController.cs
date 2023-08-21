@@ -6,6 +6,7 @@ using Blog.WebAPI.DTO.Responses;
 using Blog.WebAPI.DTO.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Blog.WebAPI.Controllers
 {
@@ -35,6 +36,7 @@ namespace Blog.WebAPI.Controllers
             return StatusCode(201, _mapper.Map<UserResponse>(newUser));
         }
 
+        [Authorize(Roles = "Администратор")]
         [HttpDelete]
         [Route("users/:userId")]
         public async Task<IActionResult> DeleteUser(int userId)
@@ -43,9 +45,28 @@ namespace Blog.WebAPI.Controllers
             return StatusCode(201, _mapper.Map<UserResponse>(deletedUser));
         }
 
+        [Authorize]
+        [HttpPatch]
+        [Route("users/me")]
+        public async Task<IActionResult> UpdateUser(UserMeUpdateRequest updateRequest)
+        {
+            var userId = _userService.GetUserByEmail(Request.HttpContext.User.FindFirst(ClaimsIdentity.DefaultNameClaimType)!.Value).Id;
+
+            var updatedUser = await _userService.UpdateUser(
+                userId,
+                updateRequest.FirstName,
+                updateRequest.LastName,
+                updateRequest.Password,
+                updateRequest.Email,
+                updateRequest.Photo,
+                _userService.GetUserById(userId).Role.Id);
+            return StatusCode(201, _mapper.Map<UserResponse>(updatedUser));
+        }
+
+        [Authorize(Roles = "Администратор")]
         [HttpPatch]
         [Route("users/:userId")]
-        public async Task<IActionResult> UpdateUser(int userId, UserUpdateRequest updateRequest)
+        public async Task<IActionResult> UpdateUserRole(int userId, UserAdminUpdateRequest updateRequest)
         {
             var updatedUser = await _userService.UpdateUser(
                 userId,
@@ -58,6 +79,7 @@ namespace Blog.WebAPI.Controllers
             return StatusCode(201, _mapper.Map<UserResponse>(updatedUser));
         }
 
+        [Authorize]
         [HttpGet]
         [Route("users")]
         public IActionResult GetAllUsers()
@@ -68,6 +90,7 @@ namespace Blog.WebAPI.Controllers
             return StatusCode(201, allUsers);
         }
 
+        [Authorize]
         [HttpGet]
         [Route("users/:userId/posts")]
         public IActionResult GetPostsForUser(int userId)
@@ -76,6 +99,7 @@ namespace Blog.WebAPI.Controllers
             return StatusCode(201, _mapper.Map<PostResponse>(posts));
         }
 
+        [Authorize]
         [HttpGet]
         [Route("users/:userId/comments")]
         public IActionResult GetCommentsForUser(int userId)
@@ -84,7 +108,7 @@ namespace Blog.WebAPI.Controllers
             return StatusCode(201, _mapper.Map<CommentResponse>(comments));
         }
 
-        [Authorize(Roles = "Администратор")]
+        [Authorize]
         [HttpGet]
         [Route("users/:userEmail")]
         public IActionResult GetUserByEmail(string email)
@@ -96,7 +120,7 @@ namespace Blog.WebAPI.Controllers
             }
             catch (InvalidOperationException)
             {
-                var response = new ServerResponse()
+                var response = new StatusCodeResponse()
                 {
                     StatusCode = 404,
                     Comment = "Пользователя с такой почтой не существует.",
@@ -105,6 +129,7 @@ namespace Blog.WebAPI.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet]
         [Route("users/:userId")]
         public IActionResult GetUserById(int userId)
@@ -116,7 +141,7 @@ namespace Blog.WebAPI.Controllers
             }
             catch (InvalidOperationException)
             {
-                var response = new ServerResponse()
+                var response = new StatusCodeResponse()
                 {
                     StatusCode = 404,
                     Comment = "Пользователя с таким идентификатором не существует.",

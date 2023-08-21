@@ -2,7 +2,6 @@
 using Blog.DAL.Models;
 using Blog.WebAPI.DTO.Comments;
 using Blog.WebAPI.DTO.Posts;
-using Blog.WebAPI.DTO.Roles;
 using Blog.WebAPI.DTO.Tags;
 using Blog.WebAPI.DTO.Users;
 
@@ -23,9 +22,6 @@ namespace Blog.WebAPI
 
             CreateMap<Tag, TagResponse>()
                 .ConstructUsing(v => new TagResponse(v));
-
-            CreateMap<Role, RoleResponse>()
-                .ConstructUsing(v => new RoleResponse(v));
         }
     }
 }

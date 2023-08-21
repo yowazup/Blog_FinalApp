@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blog.BLL", "Blog.BLL\Blog.B
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blog.WebAPI", "Blog.WebAPI\Blog.WebAPI.csproj", "{65489E9F-0884-40F8-B90F-A62F6416F99E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blog.Tests", "Blog.Tests\Blog.Tests.csproj", "{EA261C6A-8BD8-40B7-952E-200FBFA897CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{65489E9F-0884-40F8-B90F-A62F6416F99E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{65489E9F-0884-40F8-B90F-A62F6416F99E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{65489E9F-0884-40F8-B90F-A62F6416F99E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA261C6A-8BD8-40B7-952E-200FBFA897CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA261C6A-8BD8-40B7-952E-200FBFA897CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA261C6A-8BD8-40B7-952E-200FBFA897CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA261C6A-8BD8-40B7-952E-200FBFA897CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

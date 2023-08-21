@@ -24,7 +24,7 @@ namespace Blog.WebAPI.Controllers
         {
             try
             {
-                var response = new ServerResponse()
+                var response = new StatusCodeResponse()
                 {
                     StatusCode = 201,
                     Comment = "Пользователь авторизован.",
@@ -58,7 +58,7 @@ namespace Blog.WebAPI.Controllers
             }
             catch (InvalidOperationException)
             {
-                var response = new ServerResponse()
+                var response = new StatusCodeResponse()
                 {
                     StatusCode = 404,
                     Comment = "Пользователя с такой почтой не существует.",
