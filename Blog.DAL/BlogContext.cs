@@ -1,7 +1,5 @@
 ﻿using Blog.DAL.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Net.Mail;
-using System.Reflection.Metadata;
 
 namespace Blog.DAL
 {
@@ -20,7 +18,10 @@ namespace Blog.DAL
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite(@"Data Source=C:\Coding\Blog_FinalApp\Blog.DAL\DB\blog_db.db;");
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlite(@"Data Source=C:\Coding\Blog_FinalApp\Blog.DAL\DB\blog_db.db;");
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
